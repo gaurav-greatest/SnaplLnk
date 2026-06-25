@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: snaplink-url-shortener
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        placeholder: "Enter your MongoDB Atlas Connection URI"
+      - key: BASE_URL
+        placeholder: "Enter your deployed URL (e.g., https://your-app.onrender.com)"

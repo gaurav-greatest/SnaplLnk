@@ -1,6 +1,8 @@
-# URL Shortener System
+# SnapLink | Modern URL Shortener
 
-A production-ready URL shortening service built with **Node.js**, **Express.js**, and **MongoDB**. Converts long URLs into compact, shareable links with click analytics, custom aliases, and a scalable architecture.
+A premium, production-ready URL shortening service built with **Node.js**, **Express.js**, and **MongoDB**. Converts long URLs into compact, shareable links with click analytics, custom aliases, and a sleek glassmorphic UI.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/gaurav-greatest/SnaplLnk)
 
 ---
 
