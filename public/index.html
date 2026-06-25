@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapLink | Modern URL Shortener</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <span>SnapLink</span>
+      </div>
+      <h1 class="title">Shorten. Share. Track.</h1>
+      <p class="subtitle">A premium, self-hosted URL shortener with sub-10ms redirect latency, click analytics, and custom aliases.</p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-grid">
+      <!-- Shortener Box -->
+      <section class="card shortener-card">
+        <form id="shorten-form">
+          <div class="form-group">
+            <label for="url-input" class="form-label">Destination URL</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <input type="url" id="url-input" placeholder="https://example.com/very-long-link-to-shorten" required autocomplete="off">
+            </div>
+          </div>
+
+          <!-- Advanced Toggle -->
+          <div class="advanced-section">
+            <button type="button" class="advanced-toggle" id="advanced-toggle">
+              <span>Advanced Settings (Custom Alias)</span>
+              <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            
+            <div class="advanced-content" id="advanced-content">
+              <div class="form-group">
+                <label for="alias-input" class="form-label">Custom Alias <span class="label-hint">(optional)</span></label>
+                <div class="input-wrapper">
+                  <span class="alias-prefix">snaplink.lt/</span>
+                  <input type="text" id="alias-input" placeholder="my-brand" minlength="4" maxlength="20" pattern="^[a-zA-Z0-9_-]+$" title="Only letters, numbers, hyphens, and underscores are allowed. Minimum 4 characters.">
+                </div>
+                <p class="input-desc">Must be at least 4 characters. Only letters, numbers, hyphens, and underscores.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
+            <span class="btn-text">Shorten URL</span>
+            <span class="spinner" id="btn-spinner"></span>
+          </button>
+        </form>
+
+        <div id="error-message" class="error-banner hidden">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="error-text">An error occurred.</span>
+        </div>
+      </section>
+
+      <!-- Results Card (Hidden by default, shown after shortening) -->
+      <section class="card result-card hidden" id="result-card">
+        <div class="result-header">
+          <div class="success-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Link Shortened!
+          </div>
+        </div>
+
+        <div class="result-body">
+          <div class="form-group">
+            <label class="form-label">Your Shortened Link</label>
+            <div class="result-input-group">
+              <input type="text" id="result-url" readonly>
+              <button type="button" class="btn btn-secondary btn-copy" id="copy-btn">
+                <span class="copy-icon-wrapper">
+                  <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <svg class="check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span class="copy-text">Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="qr-and-meta">
+            <div class="qr-code-wrapper">
+              <img id="qr-image" src="" alt="QR Code" class="qr-image">
+              <span class="qr-loading">Generating QR...</span>
+            </div>
+            <div class="meta-info">
+              <div class="meta-item">
+                <span class="meta-label">Original Link</span>
+                <a id="meta-original-url" href="#" target="_blank" class="meta-value truncate"></a>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Short Code</span>
+                <span id="meta-code" class="meta-value code-badge"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-footer">
+          <button type="button" class="btn btn-outline" id="shorten-another-btn">Shorten Another URL</button>
+        </div>
+      </section>
+
+      <!-- Dashboard/History Card -->
+      <section class="card history-card">
+        <div class="history-header">
+          <div class="history-title-group">
+            <h2 class="section-title">My Links Dashboard</h2>
+            <p class="section-desc">Manage your links, view real-time click statistics, and delete records.</p>
+          </div>
+          <button class="btn btn-icon-only" id="refresh-btn" title="Refresh Links">
+            <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Desktop Links Table -->
+        <div class="table-responsive">
+          <table class="links-table">
+            <thead>
+              <tr>
+                <th>Original URL</th>
+                <th>Short Link</th>
+                <th>Clicks</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="links-tbody">
+              <!-- Dynamically populated -->
+              <tr class="table-state-row">
+                <td colspan="5">
+                  <div class="table-spinner-wrapper">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Loading your dashboard...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination-controls">
+          <button class="btn btn-outline btn-sm" id="prev-page-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="page-icon">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Previous
+          </button>
+          <span class="pagination-info" id="pagination-info">Page 1 of 1</span>
+          <button class="btn btn-outline btn-sm" id="next-page-btn" disabled>
+            Next
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="page-icon">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2026 SnapLink. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- JS Entrypoint -->
+  <script src="app.js"></script>
+</body>
+</html>

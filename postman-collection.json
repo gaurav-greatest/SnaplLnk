@@ -1,0 +1,186 @@
+{
+  "info": {
+    "_postman_id": "url-shortener-collection",
+    "name": "URL Shortener API",
+    "description": "Complete Postman collection for the URL Shortener System. Import this file into Postman to test all endpoints.\n\nBase URL: http://localhost:5000\n\nSet the `baseUrl` variable in your Postman environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "shortCode",
+      "value": "abc123",
+      "type": "string",
+      "description": "Update this after creating a short URL"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Verifies the API is running. Returns environment and timestamp."
+      },
+      "response": []
+    },
+    {
+      "name": "Shorten URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "if (res.success && res.data) {",
+              "  pm.collectionVariables.set('shortCode', res.data.shortCode);",
+              "  console.log('shortCode saved:', res.data.shortCode);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.example.com/very/long/path/that/needs/shortening?utm_source=email&utm_campaign=launch\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shorten",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "shorten"]
+        },
+        "description": "Creates a short URL. Automatically saves the shortCode to collection variables."
+      },
+      "response": []
+    },
+    {
+      "name": "Shorten URL with Custom Alias",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://github.com/your-username/url-shortener\",\n  \"customAlias\": \"my-repo\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shorten",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "shorten"]
+        },
+        "description": "Creates a short URL with a custom alias. Returns 409 if alias is already taken."
+      },
+      "response": []
+    },
+    {
+      "name": "Redirect (follow redirect)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{shortCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["{{shortCode}}"]
+        },
+        "description": "Follow the short URL redirect. Postman will follow the 302 to the original URL. Increments click count."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Analytics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/analytics/{{shortCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "analytics", "{{shortCode}}"]
+        },
+        "description": "Returns analytics for the short URL: click count, creation date, last accessed."
+      },
+      "response": []
+    },
+    {
+      "name": "List All URLs (paginated)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/urls?page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "urls"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        },
+        "description": "Lists all short URLs with pagination metadata."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete URL",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/url/{{shortCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "url", "{{shortCode}}"]
+        },
+        "description": "Permanently deletes a short URL record by shortCode."
+      },
+      "response": []
+    },
+    {
+      "name": "Shorten Invalid URL (expect 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"not-a-valid-url\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shorten",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "shorten"]
+        },
+        "description": "Tests URL validation. Should return 400 with error message."
+      },
+      "response": []
+    },
+    {
+      "name": "Unknown Short Code (expect 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/doesnotexist",
+          "host": ["{{baseUrl}}"],
+          "path": ["doesnotexist"]
+        },
+        "description": "Tests 404 handling for unknown short codes."
+      },
+      "response": []
+    }
+  ]
+}
