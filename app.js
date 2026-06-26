@@ -40,27 +40,46 @@ if (!allowedOrigins.includes('http://127.0.0.1:5000')) {
 }
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, curl)
-      if (!origin) return callback(null, true);
-      
-      // Allow exact match in our allowed list
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      
-      // Allow localtunnel/localhost.run dynamically
+  cors((req, callback) => {
+    const origin = req.header('Origin');
+    const corsOptions = {
+      methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true
+    };
+
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) {
+      corsOptions.origin = true;
+      return callback(null, corsOptions);
+    }
+
+    let isAllowed = false;
+
+    if (allowedOrigins.includes(origin)) {
+      isAllowed = true;
+    } else {
       try {
         const originUrl = new URL(origin);
-        if (originUrl.hostname.endsWith('.loca.lt') || originUrl.hostname.endsWith('.lhr.life')) {
-          return callback(null, true);
+        const hostHeader = req.header('Host');
+        
+        // Allow same-origin requests (Origin host matches Host header)
+        const isSameOrigin = originUrl.host === hostHeader;
+        
+        // Allow Vercel deployments (.vercel.app)
+        const isVercel = originUrl.hostname.endsWith('.vercel.app');
+        
+        // Allow localtunnel/localhost.run
+        const isLocalTunnel = originUrl.hostname.endsWith('.loca.lt') || originUrl.hostname.endsWith('.lhr.life');
+
+        if (isSameOrigin || isVercel || isLocalTunnel) {
+          isAllowed = true;
         }
       } catch (e) {}
+    }
 
-      callback(new Error(`CORS: Origin "${origin}" is not allowed.`));
-    },
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+    corsOptions.origin = isAllowed;
+    callback(null, corsOptions);
   })
 );
 
